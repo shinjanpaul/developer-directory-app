@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://developer-directory-app-5srl.onrender.com';
+
 
 export async function fetchDevelopers() {
   const res = await fetch(`${API_BASE}/developers`);
