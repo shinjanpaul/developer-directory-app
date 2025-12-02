@@ -1,5 +1,1 @@
 @import "tailwindcss";
-body {
-  @apply bg-slate-100 text-slate-900;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
