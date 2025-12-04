@@ -54,3 +54,17 @@
 * **JWT & Bcrypt** (Auth)
 
 ---
+## 🛠️ Installation & Setup
+
+Follow these steps to run the project locally on your machine.
+
+### Prerequisites
+Make sure you have the following installed:
+* [Node.js](https://nodejs.org/) (v14 or higher)
+* [Git](https://git-scm.com/)
+* A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account (or a local MongoDB instance)
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/shinjanpaul/developer-directory-app.git](https://github.com/shinjanpaul/developer-directory-app.git)
+cd developer-directory-app
