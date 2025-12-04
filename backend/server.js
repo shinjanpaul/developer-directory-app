@@ -1,40 +1,38 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// CORS (required for deployment)
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true
+}));
 
-// Root route (optional but helpful)
+// JSON parsing
+app.use(express.json({ limit: '10mb' }));
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/developer-directory')
+  .then(() => console.log('✅ MongoDB Connected'))
+  .catch(err => console.log('❌ MongoDB Connection Error:', err));
+
+// Routes
+const authRoute = require('./routes/auth');
+const developersRoute = require('./routes/developers');
+
+app.use('/auth', authRoute);
+app.use('/developers', developersRoute);
+
+// Health check
 app.get('/', (req, res) => {
-  res.send('API is running 🚀');
+  res.json({ message: 'Developer Directory API is running!' });
 });
 
-// --------- ROUTES ------------
-const developersRouter = require('./routes/developers');
-app.use('/developers', developersRouter);
-// -----------------------------
-
+// Start server
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is not set in .env');
-  process.exit(1);
-}
-
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    console.log('✅ Connected to MongoDB Atlas');
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB Connection Error:', err);
-  });
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

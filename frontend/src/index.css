@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+  --color-*: initial;
+}
+
+@utility dark {
+  @media (prefers-color-scheme: dark) {
+    & {
+      color-scheme: dark;
+    }
+  }
+}

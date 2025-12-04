@@ -1,121 +1,88 @@
 // src/App.jsx
-import React, { useEffect, useState } from 'react';
-import { fetchDevelopers, createDeveloper } from './api';
-import DeveloperForm from './components/DeveloperForm';
-import DeveloperList from './components/DeveloperList';
-import Toast from './components/Toast';
+import React, { useContext, useState, useEffect } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 
-
-function techStackToString(ts) {
-  if (!ts && ts !== 0) return '';
-  if (Array.isArray(ts)) return ts.map((t) => String(t).trim()).filter(Boolean).join(', ');
-  if (typeof ts === 'object') {
-    
-    try {
-      if (ts instanceof Set) return Array.from(ts).join(', ');
-      
-      return String(ts).split(',').map((s) => s.trim()).filter(Boolean).join(', ');
-    } catch {
-      return '';
-    }
-  }
-  return String(ts).trim();
-}
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
+import DeveloperDetail from './pages/DeveloperDetail';
+import EditDeveloper from './pages/EditDeveloper';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthContext } from './context/AuthContext';
 
 export default function App() {
-  const [developers, setDevelopers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
-
-  // filters
-  const [filterRole, setFilterRole] = useState('All');
-  const [searchTech, setSearchTech] = useState('');
+  const { user, signOut } = useContext(AuthContext);
+  
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    return saved === 'dark';
+  });
 
   useEffect(() => {
-    loadDevelopers();
-    
-  }, []);
-
-  const showToast = (type, message) => {
-    setToast({ type, message });
-  };
-
-  const loadDevelopers = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchDevelopers();
-      
-     
-
-      
-      const normalized = (data || []).map((d) => ({
-        ...d,
-        techStack: techStackToString(d.techStack),
-      }));
-
-      setDevelopers(normalized);
-    } catch (err) {
-      console.error(err);
-      showToast('error', 'Failed to load developers');
-    } finally {
-      setLoading(false);
+    const root = document.documentElement;
+    if (darkMode) {
+      root.setAttribute('data-theme', 'dark');
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.setAttribute('data-theme', 'light');
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-  };
+  }, [darkMode]);
 
-  const handleAddDeveloper = async (payload) => {
-    try {
-      const created = await createDeveloper(payload);
-
-      const normalized = {
-        ...created,
-        techStack: techStackToString(created.techStack || payload.techStack),
-      };
-
-      setDevelopers((prev) => [normalized, ...prev]);
-
-      return normalized;
-    } catch (err) {
-      throw err;
-    }
+  const toggleTheme = () => {
+    setDarkMode(prev => !prev);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4">
-      <div className="max-w-5xl mx-auto mt-8">
-        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 space-y-6">
-          <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-                Developer Directory
-              </h1>
-              <p className="text-slate-500 text-sm">
-                Add and search developers for Talrn internship task
-              </p>
-            </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+      <ToastContainer position="top-right" theme={darkMode ? 'dark' : 'light'} />
+      
+      <header className="bg-white dark:bg-slate-800 shadow-sm transition-colors duration-200">
+        <div className="max-w-5xl mx-auto p-4 flex items-center justify-between">
+          <Link to="/" className="font-bold text-lg dark:text-white">Developer Directory</Link>
+          
+          <nav className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border dark:border-slate-600"
+              type="button"
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
 
-            <div className="text-xs text-slate-500">React + Vite + Tailwind</div>
-          </header>
-
-          <div className="grid md:grid-cols-[1.1fr,1.4fr] gap-6 md:gap-8">
-            <DeveloperForm onAdded={handleAddDeveloper} showToast={showToast} />
-
-            <DeveloperList
-              developers={developers}
-              loading={loading}
-              filterRole={filterRole}
-              setFilterRole={setFilterRole}
-              searchTech={searchTech}
-              setSearchTech={setSearchTech}
-            />
-          </div>
-
-          <footer className="text-[12px] text-slate-400 text-center">
-            Built with React, Vite, Tailwind, Node.js and MongoDB.
-          </footer>
+            {user ? (
+              <>
+                <span className="text-sm text-slate-600 dark:text-slate-300">{user.name}</span>
+                <button onClick={signOut} className="px-3 py-1 border border-slate-300 dark:border-slate-600 rounded text-sm dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="px-3 py-1 text-sm dark:text-white hover:text-blue-600 dark:hover:text-blue-400">Login</Link>
+                <Link to="/signup" className="px-3 py-1 text-sm dark:text-white hover:text-blue-600 dark:hover:text-blue-400">Signup</Link>
+              </>
+            )}
+          </nav>
         </div>
-      </div>
+      </header>
 
-      <Toast toast={toast} onClose={() => setToast(null)} />
+      <main className="py-8">
+        <div className="max-w-5xl mx-auto px-4">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/developers/:id" element={<ProtectedRoute><DeveloperDetail /></ProtectedRoute>} />
+            <Route path="/developers/:id/edit" element={<ProtectedRoute><EditDeveloper /></ProtectedRoute>} />
+          </Routes>
+        </div>
+      </main>
     </div>
   );
 }
