@@ -54,6 +54,32 @@
 * **JWT & Bcrypt** (Auth)
 
 ---
+## 🏗️ Architecture Overview
+
+This application follows a **Client-Server** architecture using the **MERN Stack**.
+
+### 1. **Frontend (Client-Side)**
+* Built with **React (Vite)** for a fast, single-page application experience.
+* Uses **Context API** to manage global Authentication state (User sessions).
+* Communicates with the backend via **RESTful API calls** using `fetch` or `axios`.
+* Deployed on **Vercel** for high-performance edge delivery.
+
+### 2. **Backend (Server-Side)**
+* Built with **Node.js** and **Express.js**.
+* Exposes secure API endpoints (e.g., `/api/developers`, `/api/auth`).
+* Implements **JWT (JSON Web Tokens)** to protect private routes; the server verifies the token before allowing CRUD operations.
+* Deployed on **Render** as a web service.
+
+### 3. **Database**
+* **MongoDB Atlas** (Cloud) stores all user and developer data.
+* **Mongoose** is used as an ODM (Object Data Modeling) tool to enforce strict schemas for Developer profiles.
+
+### 🔄 Data Flow
+1.  User logs in → Server verifies credentials → Returns **JWT**.
+2.  Frontend stores JWT in memory/local storage.
+3.  User requests "Developer List" → Frontend sends GET request with JWT.
+4.  Server verifies JWT → Fetches data from MongoDB → Returns JSON response.
+5.  Frontend renders the data using Tailwind CSS components.
 ## 🛠️ Installation & Setup
 
 Follow these steps to run the project locally on your machine.
